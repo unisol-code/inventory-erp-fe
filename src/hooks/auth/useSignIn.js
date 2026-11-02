@@ -43,18 +43,23 @@ export const useSignIn = () => {
         data,
       });
       console.log("res", res);
-      if (res) {
-        setLoading(false);
-        setSAdminResponse(res);
-        setToast({ type: "success", message: res?.message });
-        // Store the token and user info
-        sessionStorage.setItem("token", res?.token);
-        sessionStorage.setItem("superAdminId", res?.id);
-        sessionStorage.setItem("companyId", res?.companyId);
-        console.log("company", res?.companyId)
-        setUserInfo({
-          isAuthenticated: true,
-        });
+if (res) {
+          setLoading(false);
+          setSAdminResponse(res);
+          setToast({ type: "success", message: res?.message });
+          // Store the token and user info
+          sessionStorage.setItem("token", res?.token);
+          sessionStorage.setItem("superAdminId", res?.id);
+          sessionStorage.setItem("companyId", res?.companyId);
+          sessionStorage.setItem("companyName", res?.companyName);
+          sessionStorage.setItem("superAdminName", res?.name);
+          // Store company for auto-theme selection
+          sessionStorage.setItem("selectedCompanyId", res?.companyId);
+          sessionStorage.setItem("selectedCompanyName", res?.companyName);
+          console.log("company", res?.companyId)
+          setUserInfo({
+            isAuthenticated: true,
+          });
 
         setAlertContent({
           type: "success",

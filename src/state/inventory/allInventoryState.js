@@ -1,16 +1,10 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
+import { createPersistedAtom } from "../recoilConfig";
 
-const { persistAtom } = recoilPersist();
+export const fixProductsByIDAtom = atom(
+  createPersistedAtom("fixProductsByID", null)
+);
 
-export const fixProductsByIDAtom = atom({
-  key: "fixProductsByID",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
-
-export const similarProductsAtom = atom({
-    key: "similarProducts",
-    default: [],
-    effects_UNSTABLE: [persistAtom],
-  });
+export const similarProductsAtom = atom(
+  createPersistedAtom("similarProducts", [])
+);

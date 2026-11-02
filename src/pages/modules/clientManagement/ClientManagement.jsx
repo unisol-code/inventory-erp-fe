@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 import useClientManagement from "../../../hooks/clientManagement/useClientManagement";
 import { CiSearch } from "react-icons/ci";
 import { FaFilter } from "react-icons/fa";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../components/common/Pagination";
+import Button from "../../../components/common/Button";
+import Table from "../../../components/common/Table";
+import BreadCrumb from "../../../components/common/BreadCrumb";
 import CreateClientDialog from "../../../components/Dialog/CreateClientDialog";
 import ViewClientDetailsDialog from "../../../components/Dialog/ViewClientDetailsDialog";
+import { useTheme } from "../../../hooks/theme/useTheme";
 import { useTender } from "../../../hooks/tender/useTender";
+
 const ClientManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [selectedId, setSelectedId] = useState(null);
+  const { theme } = useTheme();
   const {
     fetchClientListByQuery,
     fetchClientDetailsById,
@@ -24,7 +31,6 @@ const ClientManagement = () => {
     mouValidity,
     manufacturerName,
     createClient,
-    loading,
   } = useClientManagement();
 
   const { fetchStockName, stockName } = useTender();
@@ -43,152 +49,109 @@ const ClientManagement = () => {
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
-    setPage(1); // Reset to the first page whenever a new search starts
+    setPage(1);
   };
+
   const handlePageChange = (newPage) => {
-    setPage(newPage); // Update page state
+    setPage(newPage);
   };
+
   const handleItemsPerPageChange = (newLimit) => {
-    setLimit(newLimit); // Update items per page
-    fetchClientListByQuery(page, newLimit, searchTerm.trim());
+    setLimit(newLimit);
+    setPage(1);
   };
 
-  console.log("clientsByQuery :", clientsByQuery);
-  console.log("applicableGst :", applicableGst);
-  console.log("mouValidity :", mouValidity);
-  console.log("stockName :", stockName);
-  console.log("manufacturerName :", manufacturerName);
-
-  const [isCreateClientDialogOpen, setIsCreateClientDialogOpen] =
-    useState(false);
+  const [isCreateClientDialogOpen, setIsCreateClientDialogOpen] = useState(false);
   const [isViewClientDialogOpen, setIsViewClientDialogOpen] = useState(false);
 
-  // Function to toggle the modal
   const toggleModal = () => {
     setIsCreateClientDialogOpen(true);
   };
+
   const handleViewDetails = (id) => {
-    console.log("id :", id);
     fetchClientDetailsById(id);
     setSelectedId(id);
     setIsViewClientDialogOpen(true);
   };
-  console.log("clientsById :", clientsById);
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      fetchClientListByQuery(page, limit, searchTerm);
-    } else {
-      console.log("Please enter a search term.");
-    }
-  };
+  const breadcrumbPaths = [
+    { label: "Dashboard", url: "/inventory-dashboard" },
+    { label: "Client Management" },
+  ];
 
-  const onPageChange = (data) => {
-    console.log("data", data);
-    setPage(data);
-  };
-
-  const onItemsPerPageChange = (newLimit) => {
-    setLimit(newLimit);
-    setPage(1); // Reset to the first page whenever the items per page change
-  };
-
-  return (
-    <div className="container mx-auto  client">
-      {/* Card */}
-      <div className="bg-white shadow-lg rounded-lg p-6">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="clienthead">Client Management</h1>
+  const columns = [
+    { field: "srNo", header: "Sr No", sortable: true },
+    { field: "dealerName", header: "Dealer Name", sortable: true },
+    { field: "manufacturerName", header: "Manufacturer Name", sortable: true },
+    { field: "productName", header: "Name of Product", sortable: true },
+    { field: "productCode", header: "Product Code", sortable: true },
+    { field: "hsnCode", header: "HSN Code", sortable: true },
+    {
+      field: "action",
+      header: "Action",
+      body: (row) => (
+        <div className="flex justify-center gap-2">
           <button
-            className="text-dark px-4 py-2 rounded createclient hover:scale-[1.1] transition duration-300"
-            onClick={toggleModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white rounded-lg hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: theme?.accentColor || "#1C5CD6" }}
+            onClick={() => handleViewDetails(row._id)}
           >
-            Create
+            <Eye size={14} />
+            View Details
           </button>
         </div>
+      ),
+    },
+  ];
 
-        <div className="mt-4 px-6 w-full flex items-center gap-4 py-2">
-          <span className="relative min-w-[40%]">
-            <CiSearch
-              onClick={() => {
-                if (searchTerm.trim()) {
-                  fetchClientListByQuery(page, limit, searchTerm.trim());
-                }
-              }}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-2xl cursor-pointer hover:scale-[1.1] transition duration-300 hover:text-black"
-            />
+  return (
+    <div className="container mx-auto client">
+      <BreadCrumb paths={breadcrumbPaths} />
+
+      <div className="bg-white shadow-lg rounded-xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold" style={{ color: theme?.accentColor || "#2D3748" }}>
+            Client Management
+          </h1>
+          <Button
+            label="Create"
+            icon="pi pi-plus"
+            variant="primary"
+            onClick={toggleModal}
+            className="h-10 px-5"
+          />
+        </div>
+
+        <div className="mt-4 mb-4 w-full flex items-center gap-4">
+          <span className="relative flex-1 min-w-[200px]">
+            <CiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-2xl" />
             <input
               type="text"
               placeholder="Quick Search"
-              className="border w-full h-[40px] rounded-full pl-12 pr-4 py-2 border-gray-500"
+              className="w-full h-10 border border-gray-300 rounded-full pl-12 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={searchTerm}
-              onChange={handleSearchInputChange} // Update searchTerm and reset page
+              onChange={handleSearchInputChange}
             />
           </span>
-          <FaFilter />
-        </div>
-        {/* Table Section */}
-        <div className="border-t border-gray-300 w-full h-[460px] overflow-y-scroll">
-          <table className="table-auto w-full">
-            <thead className="">
-              <tr>
-                <th className="text-left px-4 py-4">Sr No</th>
-                <th className="text-left px-4 py-4">Dealer Name</th>
-                <th className="text-left px-4 py-4">Manufacturer Name</th>
-                <th className="text-left px-4 py-4">Name of Product</th>
-                <th className="text-left px-4 py-4">Product Code</th>
-                <th className="text-left px-4 py-4">HSN Code</th>
-                <th className="text-left px-4 py-4">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Dummy Data */}
-              {clientsByQuery?.clients?.map((client) => (
-                <tr key={client?._id} className="border-t">
-                  <td className="px-4 py-4">{client?.srNo}</td>
-                  <td className="px-4 py-4">{client?.dealerName}</td>
-                  <td className="px-4 py-4">{client?.manufacturerName}</td>
-                  <td className="px-4 py-4">{client?.productName}</td>
-                  <td className="px-4 py-4">{client?.productCode}</td>
-                  <td className="px-4 py-4">{client?.hsnCode}</td>
-                  <td className="px-4 py-4">
-                    <button
-                      className="bg-[#56AAC5] w-[130px] text-[15px] text-white px-2 py-1 rounded-md hover:scale-[1.1] transition duration-300"
-                      onClick={() => handleViewDetails(client?._id)}
-                    >
-                      View Details
-                    </button>
-                    {isViewClientDialogOpen &&
-                      selectedId === client?._id &&
-                      clientsById && (
-                        <ViewClientDetailsDialog
-                          data={clientsById}
-                          applicableGst={applicableGst}
-                          mouValidity={mouValidity}
-                          stockName={stockName}
-                          manufacturerName={manufacturerName}
-                          onClose={() => {
-                            resetFetchClientDetailsById();
-                            setIsViewClientDialogOpen(false);
-                          }}
-                        />
-                      )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <FaFilter className="text-gray-500 cursor-pointer hover:text-gray-700" />
         </div>
 
-        {/* Pagination */}
+        <Table
+          data={clientsByQuery?.clients || []}
+          columns={columns}
+          emptyMessage="No clients found."
+        />
+
         <Pagination
           currentPage={page}
           totalPages={clientsByQuery?.pagination?.totalPages || 1}
-          onPageChange={onPageChange}
-          onItemsPerPageChange={onItemsPerPageChange}
+          totalItems={clientsByQuery?.pagination?.totalItems}
+          itemsPerPage={limit}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
       </div>
+
       {isCreateClientDialogOpen && (
         <CreateClientDialog
           applicableGst={applicableGst}
@@ -196,6 +159,20 @@ const ClientManagement = () => {
           stockName={stockName}
           manufacturerName={manufacturerName}
           onClose={() => setIsCreateClientDialogOpen(false)}
+        />
+      )}
+
+      {isViewClientDialogOpen && selectedId && clientsById && (
+        <ViewClientDetailsDialog
+          data={clientsById}
+          applicableGst={applicableGst}
+          mouValidity={mouValidity}
+          stockName={stockName}
+          manufacturerName={manufacturerName}
+          onClose={() => {
+            resetFetchClientDetailsById();
+            setIsViewClientDialogOpen(false);
+          }}
         />
       )}
     </div>

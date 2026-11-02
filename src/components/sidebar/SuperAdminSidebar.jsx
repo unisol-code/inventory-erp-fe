@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-//import UnisolLogoImage from "../../assets/images/unisolLogoImg.png";
-// import { useSignIn } from "../hooks/auth/useSignIn";
 import { useSetRecoilState } from "recoil";
-// import { userAuthState } from "../../state/isAuthenticatedAtom";
+import {
+  ChevronDown,
+  ChevronLeft,
+  HelpCircle,
+  Phone,
+  LogOut,
+} from "lucide-react";
+import { useSignIn } from "../../hooks/auth/useSignIn";
+import { userAuthState } from "../../state/authenticatedState/authenticatedState";
+import { useTheme } from "../../hooks/theme/useTheme";
+
 import dashboard from "../../assets/images/dashboard.png";
 import inventoryImg from "../../assets/images/inventoryImg.png";
 import warehouseImg from "../../assets/images/warehouseImg.png";
@@ -15,23 +22,10 @@ import clientMgmtImg from "../../assets/images/clientMgmtImg.png";
 import tenderImg from "../../assets/images/tenderImg.png";
 import reportsImg from "../../assets/images/reportsImg.png";
 import inventoryMainImg from "../../assets/images/inventoryMainImg.png";
-import unisolServicesImg from "../../assets/images/unisolservices.png";
-// import training from "../../assets/images/training.png";
-import contactUs from "../../assets/images/contactUs.png";
-import helpCentre from "../../assets/images/helpCentre.png";
-import { useSignIn } from "../../hooks/auth/useSignIn";
-import { userAuthState } from "../../state/authenticatedState/authenticatedState";
-import { useTheme } from "../../hooks/theme/useTheme";
 
-const SuperAdminSidebar = ({
-  toggleSidebar,
-  isSidebarVisible,
-  setActiveTab,
-}) => {
-  const [isInventoryExapanded, setInventoryExpanded] = useState(false);
-  const [isProductExapanded, setProductExpanded] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("Dashboard");
+const SuperAdminSidebar = ({ setActiveTab, isCollapsed, toggleCollapse }) => {
   const [expandedMenu, setExpandedMenu] = useState(null);
+  const [activeChild, setActiveChild] = useState(null);
 
   const { resetSuperAdmin } = useSignIn();
   const setUserInfo = useSetRecoilState(userAuthState);
@@ -39,59 +33,97 @@ const SuperAdminSidebar = ({
   const location = useLocation();
   const { theme } = useTheme();
 
+  const getBg = () => theme?.bgSidebar || "#E9EBF7";
+  const getPrimary = () => theme?.primaryColor || "#A9B5FF";
+  const getSecondary = () => theme?.secondaryColor || "#CAD2FF";
+  const getHighlight = () => theme?.highlightColor || getSecondary();
+  const getBgImage = () => theme?.backgroundImg || "";
+  const getLogo = () => theme?.logoImage || inventoryMainImg;
+
+  const getSidebarText = () => theme?.sidebarText || getBg();
+  const getSidebarIcon = () => theme?.sidebarIcon || getSidebarText();
+  const getSidebarHover = () => theme?.sidebarHover || "rgba(255,255,255,0.15)";
+  const getActiveModuleBg = () => theme?.activeModuleBg || getSidebarHover();
+  const getActiveModuleText = () => theme?.activeModuleText || getPrimary();
+  const getActiveSubModuleBg = () => theme?.activeSubModuleBg || "rgba(255,255,255,0.3)";
+  const getActiveSubModuleText = () => theme?.activeSubModuleText || getPrimary();
+  const getActiveIndicator = () => theme?.activeIndicator || getPrimary();
+  const getSidebarDivider = () => theme?.sidebarDivider || "rgba(255,255,255,0.2)";
+
+  // useEffect(() => {
+  //   if (location.pathname === "/inventory-dashboard") {
+  //     setActiveTab("Dashboard");
+  //   }
+  //   const matchItem = menuItems.find(
+  //     (item) =>
+  //       item.type === "accordion" &&
+  //       item.subItems?.some((sub) => isLinkActive(sub.path))
+  //   );
+  //   if (matchItem) {
+  //     setExpandedMenu(matchItem.id);
+  //     const matchedChild = matchItem.subItems?.find((sub) => isLinkActive(sub.path));
+  //     setActiveChild(matchedChild ? matchedChild.path : matchItem.firstChildPath);
+  //   }
+  // }, [location.pathname, setActiveTab]);
+
   useEffect(() => {
+    const matchItem = menuItems.find(
+      (item) =>
+        item.type === "accordion" &&
+        item.subItems?.some((sub) => sub.path === location.pathname)
+    );
+
+    // Only the parent belonging to the current route stays expanded
+    setExpandedMenu(matchItem?.id ?? null);
+
+    // Only the child belonging to the current route stays active
+    const matchedChild = matchItem?.subItems?.find(
+      (sub) => sub.path === location.pathname
+    );
+
+    setActiveChild(matchedChild?.path ?? null);
+
     if (location.pathname === "/inventory-dashboard") {
-      setSelectedItem("Dashboard");
+      setActiveTab("Dashboard");
     }
-  }, []);
+  }, [location.pathname, setActiveTab]);
 
-  // Automatically expand the correct subtab based on the current route
-  useEffect(() => {
-    if (
-      location.pathname.includes("/inventory") ||
-      location.pathname.includes("/inventory/inventory-tracking") ||
-      location.pathname.includes("/inventory/quotation") ||
-      location.pathname.includes("/inventory/proposals")
-    ) {
-      setInventoryExpanded(true);
-      setProductExpanded(false);
-    } else if (
-      location.pathname.includes("/product") ||
-      location.pathname.includes("/product/product-order")
-    ) {
-      setProductExpanded(true);
-      setInventoryExpanded(false);
-    }
-  }, [location.pathname]);
-
-  const handleTabClick = (tabName) => {
-    setSelectedItem(tabName);
+  const handleTabClick = (tabName, isAccordionParent = false) => {
     setActiveTab(tabName);
-
-    // Close other menus when a new menu is opened
-    if (tabName === "Inventory") {
-      setInventoryExpanded(!isInventoryExapanded);
-      setProductExpanded(false);
-    } else if (tabName === "Product") {
-      setProductExpanded(!isProductExapanded);
-      setInventoryExpanded(false);
-    } else {
-      // Close both menus when clicking on other tabs
-      setInventoryExpanded(false);
-      setProductExpanded(false);
+    if (!isAccordionParent) {
+      setExpandedMenu(null);
+      setActiveChild(null);
     }
   };
 
-  const toggleInventorySubtabs = () => {
-    setInventoryExpanded(!isInventoryExapanded);
-  };
+  // const toggleMenu = (menuId, firstChildPath = null) => {
+  //   if (expandedMenu === menuId) {
+  //     setExpandedMenu(null);
+  //     setActiveChild(null);
+  //   } else {
+  //     setExpandedMenu(menuId);
+  //     if (firstChildPath) {
+  //       setActiveChild(firstChildPath);
+  //     }
+  //   }
+  // };
 
-  const toggleProductSubtabs = () => {
-    setProductExpanded(!isProductExapanded);
+  const toggleMenu = (menuId, firstChildPath = null) => {
+    setExpandedMenu((previousMenu) => {
+      if (previousMenu === menuId) {
+        setActiveChild(null);
+        return null;
+      }
+
+      setActiveChild(firstChildPath);
+      return menuId;
+    });
   };
 
   const handleLogout = () => {
     sessionStorage.clear();
+    localStorage.clear();
+    // setToast({ type: "success", message: "Logged out successfully" });
     setUserInfo({
       isAuthenticated: false,
     });
@@ -99,397 +131,348 @@ const SuperAdminSidebar = ({
     navigate("/");
   };
 
-  /*const getBackgroundColor = (itemName) => {
-    if (itemName === "Inventory") {
-      return isInventoryExapanded ? "#A9B5FF" : "#CAD2FF";
-    }
-    if (itemName === "Product") {
-      return isProductExapanded ? "#A9B5FF" : "#CAD2FF";
-    }
-    return selectedItem === itemName ? "#A9B5FF" : "#CAD2FF";
-  };*/
+  const isLinkActive = (path) => location.pathname === path;
 
-  const getBackgroundColor = (itemName) => {
-    const primaryColor = theme?.primaryColor || "#A9B5FF";
-    const secondaryColor = theme?.secondaryColor || "#CAD2FF";
-    const dropdownColor = theme?.dropdownColor || secondaryColor;
+  const menuItems = [
+    {
+      id: "dashboard",
+      name: "Dashboard",
+      icon: dashboard,
+      path: "/inventory-dashboard",
+      type: "link",
+    },
+    {
+      id: "inventory",
+      name: "Inventory",
+      icon: inventoryImg,
+      type: "accordion",
+      firstChildPath: "/inventory",
+      subItems: [
+        { name: "All Inventory", path: "/inventory" },
+        { name: "Inventory Tracking", path: "/inventory/inventory-tracking" },
+        { name: "Quotation", path: "/inventory/quotation" },
+        { name: "Proposals", path: "/inventory/proposals" },
+      ],
+    },
+    {
+      id: "warehouse",
+      name: "Warehouse Management",
+      icon: warehouseImg,
+      path: "/warehouse-management",
+      type: "link",
+    },
+    {
+      id: "product",
+      name: "Product",
+      icon: ProductImg,
+      type: "accordion",
+      firstChildPath: "/product",
+      subItems: [
+        { name: "Product Management", path: "/product" },
+        { name: "Purchase Order", path: "/product/product-order" },
+      ],
+    },
+    {
+      id: "replenishment",
+      name: "Replenishment",
+      icon: replenishmentImg,
+      path: "/replenishment",
+      type: "link",
+    },
+    {
+      id: "vendor",
+      name: "Vendor Management",
+      icon: vendorMgmtImg,
+      path: "/vendor-management",
+      type: "link",
+    },
+    {
+      id: "client",
+      name: "Client Management",
+      icon: clientMgmtImg,
+      path: "/client-management",
+      type: "link",
+    },
+    {
+      id: "tender",
+      name: "Tender Management",
+      icon: tenderImg,
+      path: "/tender-management",
+      type: "link",
+    },
+    {
+      id: "reports",
+      name: "Reports",
+      icon: reportsImg,
+      path: "/reports",
+      type: "link",
+    },
+  ];
 
-    if (theme?.backgroundImg) {
-      return itemName === selectedItem ? primaryColor : secondaryColor;
+  const renderMenuItem = (item) => {
+    const Icon = item.icon;
+    const hasSubmenu = item.type === "accordion";
+    const isExpanded = expandedMenu === item.id;
+    const isParentChildActive = item.subItems?.some(
+      (sub) => activeChild === sub.path || isLinkActive(sub.path)
+    );
+    // const isActive = !hasSubmenu
+    //   ? isLinkActive(item.path)
+    //   : expandedMenu === item.id || isParentChildActive;
+
+    const isActive = hasSubmenu
+      ? isExpanded
+      : location.pathname === item.path;
+
+    if (hasSubmenu) {
+      return (
+        <div key={item.id} className="mb-1">
+          <button
+            type="button"
+            onClick={() => toggleMenu(item.id, item.firstChildPath)}
+            className="w-full flex items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 group"
+            style={{
+              backgroundColor: isActive ? getActiveModuleBg() : "transparent",
+              color: isActive ? getActiveModuleText() : getSidebarText(),
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) e.currentTarget.style.backgroundColor = getSidebarHover();
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) e.currentTarget.style.backgroundColor = "transparent";
+            }}
+            title={item.name}
+          >
+            <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 ml-1">
+              <img
+                src={Icon}
+                alt={item.name}
+                className="w-5 h-5 object-contain transition-transform duration-200"
+              />
+            </span>
+            {!isCollapsed && (
+              <>
+                <span className="flex-1 text-sm font-medium">
+                  {item.name}
+                </span>
+                <ChevronDown
+                  size={16}
+                  className="transition-transform duration-200"
+                  style={{
+                    color: getSidebarIcon(),
+                    transform: isExpanded ? "rotate(180deg)" : "rotate(0)",
+                  }}
+                />
+              </>
+            )}
+          </button>
+          {isExpanded && !isCollapsed && (
+            <ul className="mt-1 space-y-1">
+              {item.subItems?.map((sub) => {
+                const isChildActive = activeChild ? activeChild === sub.path : isLinkActive(sub.path);
+                return (
+                  <li key={sub.path}>
+                    <NavLink
+                      to={sub.path}
+                      onClick={() => {
+                        handleTabClick(sub.name, true);
+                        setActiveChild(sub.path);
+                      }}
+                      className="block w-full rounded-lg text-xs font-medium py-2 pl-10 pr-3 transition-all duration-200 relative overflow-hidden"
+                      style={{
+                        backgroundColor: isChildActive
+                          ? getActiveSubModuleBg()
+                          : "transparent",
+                        color: isChildActive
+                          ? getActiveSubModuleText()
+                          : getSidebarText(),
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isChildActive) e.currentTarget.style.backgroundColor = getSidebarHover();
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isChildActive) e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      {isChildActive && (
+                        <span
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full"
+                          style={{ backgroundColor: getActiveIndicator() }}
+                        />
+                      )}
+                      {sub.name}
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      );
     }
 
-    if (itemName === "Inventory") {
-      return isInventoryExapanded ? primaryColor : secondaryColor;
-    }
-    if (itemName === "Product") {
-      return isProductExapanded ? primaryColor : secondaryColor;
-    }
-    return selectedItem === itemName ? primaryColor : secondaryColor;
+    return (
+      <li key={item.id} className="mb-1">
+        <NavLink
+          to={item.path}
+          onClick={() => handleTabClick(item.name, true)}
+          className="flex items-center gap-3 rounded-xl p-3 text-sm font-medium transition-all duration-200 relative group"
+          style={{
+            backgroundColor: isLinkActive(item.path) ? getActiveModuleBg() : "transparent",
+            color: isLinkActive(item.path) ? getActiveModuleText() : getSidebarText(),
+          }}
+          onMouseEnter={(e) => {
+            if (!isLinkActive(item.path)) e.currentTarget.style.backgroundColor = getSidebarHover();
+          }}
+          onMouseLeave={(e) => {
+            if (!isLinkActive(item.path)) e.currentTarget.style.backgroundColor = "transparent";
+          }}
+          title={item.name}
+        >
+          {isLinkActive(item.path) && (
+            <span
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full"
+              style={{ backgroundColor: getActiveIndicator() }}
+            />
+          )}
+          <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 ml-1">
+            <img
+              src={Icon}
+              alt={item.name}
+              className="w-5 h-5 object-contain transition-transform duration-200"
+            />
+          </span>
+          {!isCollapsed && <span className="truncate">{item.name}</span>}
+        </NavLink>
+      </li>
+    );
   };
 
   return (
     <div
-      className="px-4 w-full min-h-full relative"
+      className="flex flex-col h-full"
       style={{
-        backgroundColor: theme?.bgSidebar || "#E9EBF7",
-        zIndex: 10,
+        backgroundColor: getBg(),
+        backgroundImage: getBgImage()
+          ? `linear-gradient(180deg, ${getPrimary()}0A 0%, ${getHighlight()}0A 100%)`
+          : `linear-gradient(180deg, ${getPrimary()}0A 0%, ${getHighlight()}0A 100%)`,
       }}
     >
-      {theme?.backgroundImg && (
+      {getBgImage() && (
         <div
+          className="absolute inset-0 opacity-30"
           style={{
-            backgroundImage: `url(${theme.backgroundImg})`,
+            backgroundImage: `url(${getBgImage()})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "contain",
             backgroundPosition: "center bottom",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "335px",
-            zIndex: 0,
-            opacity: 0.5,
           }}
         />
       )}
-      <div
-        className="flex flex-col relative"
-        style={{
-          zIndex: 10,
-        }}
-      >
-        <div className="w-full flex flex-col justify-center items-center">
-          {theme?.logoImage && (
+
+      <div className="relative flex flex-col h-full">
+        <div className="flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${getSidebarDivider()}` }}>
+          <div className="flex items-center justify-center w-full">
             <img
-              className="h-[110px] w-[220px] object-contain"
-              src={theme.logoImage}
+              src={getLogo()}
               alt="Company Logo"
+              className={`object-contain transition-all duration-300 ${isCollapsed ? "h-12 w-12" : "h-14 w-full"
+                }`}
             />
-          )}
-          <img
-            className="h-[110px] w-[220px] object-contain"
-            src={inventoryMainImg}
-            alt=""
-          />
+          </div>
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            className="hidden md:block absolute top-4 right-[-18px] shadow-xl rounded-full p-1.5 transition-all duration-200 z-10"
+            style={{
+              backgroundColor: theme?.cardBg || "#FFFFFF",
+              color: theme?.textColor || "#334155",
+            }}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <ChevronLeft
+              size={16}
+              className={`transition-transform duration-200 ${isCollapsed ? "rotate-180" : ""
+                }`}
+            />
+          </button>
         </div>
-        <nav>
-          <ul>
-            <li
-              onClick={() => handleTabClick("Dashboard")}
-              className="border-transparent"
-            >
-              <NavLink to="/inventory-dashboard" className="cursor-pointer">
-                <div
-                  className="flex pl-5 p-4 text-black h-[33px] text-sm items-center gap-4 my-5 rounded-xl"
-                  style={{ backgroundColor: getBackgroundColor("Dashboard") }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={dashboard}
-                      alt="Dashboard Icon"
-                      className="w-6 h-6"
-                    />
-                  </span>
-                  Dashboard
-                </div>
-              </NavLink>
-            </li>
 
-            <li onClick={() => handleTabClick("Inventory")}>
-              <div
-                className="flex pl-1 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl cursor-pointer"
-                style={{ backgroundColor: getBackgroundColor("Inventory") }}
-              >
-                <span className="ml-0">
-                  <img
-                    src={inventoryImg}
-                    alt="Inventory Icon"
-                    className="w-12 h-12 mt-1"
-                  />
-                </span>
-                Inventory
-                <span className="ml-auto text-gray-500">
-                  {isInventoryExapanded ? <FaChevronUp /> : <FaChevronDown />}
-                </span>
-              </div>
-              {isInventoryExapanded && (
-                <ul
-                  className="w-full rounded-xl overflow-hidden text-xs border-[0.5px] border-gray-300"
-                  style={{
-                    width: "90%",
-                    marginLeft: "5%",
-                    marginRight: "6%",
-                    marginTop: "-0.5px",
-                    backgroundColor: theme?.dropdownColor || "#CAD2FF",
-                  }}
-                >
-                  <li
-                    onClick={() => handleTabClick("All Inventory")}
-                    className="border-b border-gray-300"
-                  >
-                    <NavLink to="/inventory" className="cursor-pointer">
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2] border-t border-white/20">
-                        All Inventory
-                      </div>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => handleTabClick("Inventory Tracking")}
-                    className="border-b border-gray-300"
-                  >
-                    <NavLink
-                      to="/inventory/inventory-tracking"
-                      className="cursor-pointer"
-                    >
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2] border-t border-white/20">
-                        Inventory Tracking
-                      </div>
-                    </NavLink>
-                  </li>
-                  <li
-                    onClick={() => handleTabClick("Quotation")}
-                    className="border-b border-gray-300"
-                  >
-                    <NavLink
-                      to="/inventory/quotation"
-                      className="cursor-pointer"
-                    >
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2] border-t border-white/20">
-                        Quotation
-                      </div>
-                    </NavLink>
-                  </li>
-                  <li onClick={() => handleTabClick("Proposals")}>
-                    <NavLink
-                      to="/inventory/proposals"
-                      className="cursor-pointer"
-                    >
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2] border-t border-white/20">
-                        Proposals
-                      </div>
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            <li onClick={() => handleTabClick("Warehouse Management")}>
-              <NavLink to="/warehouse-management" className="cursor-pointer">
-                <div
-                  className="flex pl-5 p-4 text-black h-[33px] text-sm items-center gap-4 my-5 rounded-xl"
-                  style={{
-                    backgroundColor: getBackgroundColor("Warehouse Management"),
-                  }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={warehouseImg}
-                      alt="Warehouse Icon"
-                      className="w-4 h-4"
-                    />
-                  </span>
-                  Warehouse Management
-                </div>
-              </NavLink>
-            </li>
-
-            <li onClick={() => handleTabClick("Product")}>
-              <div
-                className="flex p-4 text-black h-[33px] text-sm items-center gap-2 mt-5 rounded-xl w-50 cursor-pointer"
-                style={{ backgroundColor: getBackgroundColor("Product") }}
-              >
-                <span className="ml-0">
-                  <img
-                    src={ProductImg}
-                    alt="Product Icon"
-                    className="w-6 h-7 mt-2"
-                  />
-                </span>
-                Product
-                <span className="ml-auto text-gray-500">
-                  {isProductExapanded ? <FaChevronUp /> : <FaChevronDown />}
-                </span>
-              </div>
-              {isProductExapanded && (
-                <ul
-                  className="w-full rounded-xl overflow-hidden text-xs border-[0.5px] border-gray-300"
-                  style={{
-                    width: "90%",
-                    marginLeft: "5%",
-                    marginRight: "5%",
-                    marginTop: "-0.5px",
-                    backgroundColor: theme?.dropdownColor || "#CAD2FF",
-                  }}
-                >
-                  <li
-                    onClick={() => handleTabClick("Product Management")}
-                    className="border-b border-gray-300"
-                  >
-                    <NavLink to="/product" className="cursor-pointer">
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2]">
-                        Product Management
-                      </div>
-                    </NavLink>
-                  </li>
-                  <li onClick={() => handleTabClick("Purchase Order")}>
-                    <NavLink
-                      to="/product/product-order"
-                      className="cursor-pointer"
-                    >
-                      <div className="p-1.5 text-left pl-10 text-black text-[12px] leading-[1.2]">
-                        Purchase Order
-                      </div>
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            <li onClick={() => handleTabClick("Replenishment")}>
-              <NavLink to="/replenishment" className="cursor-pointer">
-                <div
-                  className="flex pl-4 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl mt-5"
-                  style={{
-                    backgroundColor: getBackgroundColor("Replenishment"),
-                  }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={replenishmentImg}
-                      alt="Replenishment Icon"
-                      className="w-5 h-5"
-                    />
-                  </span>
-                  Replenishment
-                </div>
-              </NavLink>
-            </li>
-
-            <li onClick={() => handleTabClick("Vendor Management")}>
-              <NavLink to="/vendor-management" className="cursor-pointer">
-                <div
-                  className="flex pl-5 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl mt-5"
-                  style={{
-                    backgroundColor: getBackgroundColor("Vendor Management"),
-                  }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={vendorMgmtImg}
-                      alt="Vendor Icon"
-                      className="w-4 h-4"
-                    />
-                  </span>
-                  Vendor Management
-                </div>
-              </NavLink>
-            </li>
-
-            <li onClick={() => handleTabClick("Client Management")}>
-              <NavLink to="/client-management" className="cursor-pointer">
-                <div
-                  className="flex pl-6 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl mt-5"
-                  style={{
-                    backgroundColor: getBackgroundColor("Client Management"),
-                  }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={clientMgmtImg}
-                      alt="Client Icon"
-                      className="w-3 h-4"
-                    />
-                  </span>
-                  Client Management
-                </div>
-              </NavLink>
-            </li>
-
-            <li onClick={() => handleTabClick("Tender Management")}>
-              <NavLink to="/tender-management" className="cursor-pointer">
-                <div
-                  className="flex pl-6 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl mt-5"
-                  style={{
-                    backgroundColor: getBackgroundColor("Tender Management"),
-                  }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={tenderImg}
-                      alt="Tender Mgmt Icon"
-                      className="w-3 h-4"
-                    />
-                  </span>
-                  Tender Management
-                </div>
-              </NavLink>
-            </li>
-
-            <li onClick={() => handleTabClick("Reports")}>
-              <NavLink to="/reports" className="cursor-pointer">
-                <div
-                  className="flex pl-6 p-4 text-black h-[33px] text-sm items-center gap-4 rounded-xl mt-5"
-                  style={{ backgroundColor: getBackgroundColor("Reports") }}
-                >
-                  <span className="ml-0">
-                    <img
-                      src={reportsImg}
-                      alt="Reports Icon"
-                      className="w-4 h-4"
-                    />
-                  </span>
-                  Reports
-                </div>
-              </NavLink>
-            </li>
+        <nav className="flex-1 overflow-y-auto py-3 px-2 custom-scrollbar">
+          <ul className="space-y-1">
+            {menuItems.map(renderMenuItem)}
           </ul>
         </nav>
+
+        <div className="border-t" style={{ borderColor: getSidebarDivider() }}>
+          <div
+            className={`flex flex-col ${isCollapsed ? "items-center gap-1.5 p-2" : "p-2"
+              }`}
+          >
+            <button
+              type="button"
+              onClick={() => navigate("/reports")}
+              className={`flex items-center gap-2.5 rounded-xl text-sm font-medium ${isCollapsed ? "w-9 h-9 justify-center" : "w-full py-2"
+                }`}
+              style={{ color: getSidebarIcon() }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = getSidebarHover())}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              title="Help Center"
+            >
+              <HelpCircle size={18} />
+              {!isCollapsed && <span>Help Center</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/client-management")}
+              className={`flex items-center gap-2.5 rounded-xl text-sm font-medium ${isCollapsed ? "w-9 h-9 justify-center" : "w-full py-2"
+                }`}
+              style={{ color: getSidebarIcon() }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = getSidebarHover())}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              title="Contact Us"
+            >
+              <Phone size={18} />
+              {!isCollapsed && <span>Contact Us</span>}
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`flex items-center gap-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isCollapsed ? "w-9 h-9 justify-center" : "w-full py-2"
+                }`}
+              style={{ color: getActiveModuleText() }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme?.buttonDanger || "#B42318";
+                e.currentTarget.style.color = theme?.buttonPrimaryText || "#FFFFFF";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = theme?.activeModuleText || theme?.primaryColor || "#4FA8E5";
+              }}
+              title="Log out"
+            >
+              <LogOut size={18} />
+              {!isCollapsed && <span>Log out</span>}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div
-        className="flex flex-col w-full items-start gap-8 py-8 pr-14 pl-6 relative"
-        style={{
-          zIndex: 10,
-        }}
-      >
-        <p className="cursor-pointer hover:font-medium flex text-[#7C8DB5]">
-          <span className="mr-2">
-            <img src={helpCentre} alt="Dashboard Icon" className="w-6 h-6" />
-          </span>
-          Help Center
-        </p>
-        <p className="cursor-pointer hover:font-medium flex text-[#7C8DB5]">
-          <span className="mr-2">
-            <img src={contactUs} alt="Dashboard Icon" className="w-6 h-6" />
-          </span>
-          Contact Us
-        </p>
-        <p
-          onClick={handleLogout}
-          className="cursor-pointer hover:font-medium flex text-[#000000]"
-        >
-          <span className="flex justify-center items-center gap-1 mr-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="currentColor"
-              className="bi bi-box-arrow-right ml-1"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"
-              />
-              <path
-                fillRule="evenodd"
-                d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"
-              />
-            </svg>
-          </span>
-          Log out
-        </p>
-      </div>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: ${theme?.sidebarDivider || "rgba(0,0,0,0.15)"};
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: ${theme?.sidebarText || "rgba(0,0,0,0.3)"};
+        }
+      `}</style>
     </div>
   );
 };

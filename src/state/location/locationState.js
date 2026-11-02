@@ -1,21 +1,8 @@
 import { atom } from 'recoil';
-import { recoilPersist } from 'recoil-persist';
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const countryLocationAtom = atom({
-    key: 'countryLocation',
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-});
+export const countryLocationAtom = atom(createPersistedAtom("countryLocation", []));
 
-export const stateLocationAtom = atom({
-    key: 'stateLocation',
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-});
+export const stateLocationAtom = atom(createPersistedAtom("stateLocation", []));
 
-export const cityLocationAtom = atom({
-    key: 'cityLocation',
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-});
+export const cityLocationAtom = atom(createPersistedAtom("cityLocation", []));

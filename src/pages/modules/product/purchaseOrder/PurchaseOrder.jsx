@@ -1,4 +1,4 @@
-import { Filter, Search, CirclePlus, ArrowUpDown } from "lucide-react";
+import { Filter, Search, CirclePlus, ArrowUpDown, Eye } from "lucide-react";
 import { useEffect, useCallback } from "react";
 import AddNewPurchaseDialog from "../../../../components/Dialog/AddNewPurchaseDialog";
 import { useState } from "react";
@@ -295,9 +295,10 @@ const PurchaseOrder = () => {
                 </td>
                 <td className="px-6 py-4 text-center text-sm text-black">
                   <button
-                    className="px-5 py-2 rounded-md text-white font-semibold whitespace-nowrap bg-[#56AAC5]"
+                    className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-md text-white font-semibold whitespace-nowrap bg-[#56AAC5]"
                     onClick={() => handleViewDetails(order._id)}
                   >
+                    <Eye size={14} />
                     View Details
                   </button>
                 </td>

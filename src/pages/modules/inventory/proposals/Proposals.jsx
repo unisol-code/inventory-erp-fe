@@ -1,32 +1,27 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useState, useEffect, useCallback } from "react";
+import { Eye } from "lucide-react";
+import Pagination from "../../../../components/common/Pagination";
+import Button from "../../../../components/common/Button";
+import Table from "../../../../components/common/Table";
+import BreadCrumb from "../../../../components/common/BreadCrumb";
+import AddNewProposalDialog from "../../../../components/Dialog/AddNewProposalDialog";
 import useProposals from "../../../../hooks/inventory/useProposals";
 import debounce from "lodash/debounce";
 import { useFormik } from "formik";
-import Pagination from "../../../../components/Pagination";
-import AddNewProposalDialog from "../../../../components/Dialog/AddNewProposalDialog";
-
-const columns = [
-  { id: "proposalId", label: "Propsal ID" },
-  { id: "proposalName", label: "Propsal Name" },
-  { id: "clientName", label: "Client Name" },
-  { id: "status", label: "Status" },
-  { id: "budgetEstimation", label: "Total Value" },
-  { id: "action", label: "Action" },
-];
+import { useTheme } from "../../../../hooks/theme/useTheme";
 
 const Proposals = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(7);
-  const { fetchPropsalList, proposalList, fetchSearchAllInventory, deleteProposal,
-    fetchProposalById, proposalDetails } = useProposals();
+  const { theme } = useTheme();
+  const {
+    fetchPropsalList,
+    proposalList,
+    fetchSearchAllInventory,
+    deleteProposal,
+    fetchProposalById,
+    proposalDetails,
+  } = useProposals();
 
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -55,7 +50,7 @@ const Proposals = () => {
       if (values.proposalName) {
         fetchSearchAllInventory(values);
       } else {
-        fetchAllEmployees(page, limit);
+        fetchPropsalList(page, limit);
       }
     },
   });
@@ -78,7 +73,7 @@ const Proposals = () => {
 
   const handleDelete = async (_id) => {
     await deleteProposal(_id);
-    fetchPropsalList(page, limit); // Refresh the list
+    fetchPropsalList(page, limit);
   };
 
   const handleEditEvent = (id) => {
@@ -87,106 +82,106 @@ const Proposals = () => {
     setEditing(true);
   };
 
-  return (
-    <Paper
-      sx={{
-        width: "100%",
-        overflow: "hidden",
-        borderRadius: "10px",
-        minHeight: "600px",
-      }}
-    >
-      {/* Search Section */}
-      <div className="search-section flex items-center justify-between px-6 bg-gray-100 border-b border-gray-300 py-4">
-        <h2 className="text-2xl font-bold">Proposal</h2>
-        <div className="flex items-center space-x-4">
-          <button className="bg-[#56AAC5] text-white py-2 pl-6 pr-6 rounded-lg"
-            onClick={() => setIsNewProductDialogOpen(true)}
-          >
-            Create
-          </button>
-          {isNewProductDialogOpen && (
-            <AddNewProposalDialog
-              onClose={() => setIsNewProductDialogOpen(false)}
-            />
-          )}
-          <input
-            className="w-[300px] h-10 border border-gray-400 rounded-lg px-4"
-            type="text"
-            value={formik.values.proposalName}
-            onChange={handleSearchChange}
-            placeholder="Search by Propsal Name..."
-          />
-        </div>
-      </div>
+  const breadcrumbPaths = [
+    { label: "Dashboard", url: "/inventory-dashboard" },
+    { label: "Inventory", url: "/inventory" },
+    { label: "Proposal" },
+  ];
 
-      <div className="table-section">
-        <TableContainer sx={{ maxHeight: 600 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align="center"
-                    style={{ fontWeight: "bold", color: "gray" }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {proposalList?.proposals?.map((row, index) => (
-                <TableRow key={index} hover role="checkbox" tabIndex={-1}>
-                  <TableCell align="center">{row.proposalID}</TableCell>
-                  <TableCell align="center">{row.proposalName}</TableCell>
-                  <TableCell align="center">{row.clientName}</TableCell>
-                  <TableCell align="center">{row.status}</TableCell>
-                  <TableCell align="center">{row.budgetEstimation}</TableCell>
-                  <TableCell align="center">
-                    <button
-                      className="p-2 text-white rounded-full hover:bg-blue-600"
-                      style={{ backgroundColor: "#56AAC5" }}
-                      onClick={() => handleEditEvent(row._id)}
-                    > View Details
-                    </button>
-                    {editing && selectedId === row._id && (
-                      <AddNewProposalDialog
-                        // data={row}
-                        data={proposalDetails}
-                        editing
-                        onClose={() => {
-                          setSelectedId(null);
-                          setEditing(false);
-                        }}
-                      />
-                    )}
-                    <button
-                      className="p-2 text-red-500 hover:text-red-600"
-                      onClick={() => handleDelete(row._id)}
-                    >
-                      <DeleteIcon />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+  const columns = [
+    { field: "proposalID", header: "Proposal ID", sortable: true },
+    { field: "proposalName", header: "Proposal Name", sortable: true },
+    { field: "clientName", header: "Client Name", sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "budgetEstimation", header: "Total Value", sortable: true },
+    {
+      field: "action",
+      header: "Action",
+      body: (row) => (
+        <div className="flex justify-center gap-2">
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white rounded-lg hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: theme?.accentColor || "#1C5CD6" }}
+            onClick={() => handleEditEvent(row._id)}
+          >
+            <Eye size={14} />
+            View Details
+          </button>
+          <button
+            className="p-2 text-red-500 hover:text-red-600"
+            onClick={() => handleDelete(row._id)}
+          >
+            <i className="pi pi-trash" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="container mx-auto">
+      <BreadCrumb paths={breadcrumbPaths} />
+
+      <div className="bg-white shadow-lg rounded-xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold" style={{ color: theme?.accentColor || "#2D3748" }}>
+            Proposal
+          </h1>
+          <div className="flex items-center gap-4">
+            <Button
+              label="Create"
+              icon="pi pi-plus"
+              variant="primary"
+              onClick={() => setIsNewProductDialogOpen(true)}
+              className="h-10 px-5"
+            />
+            <div className="relative">
+              <input
+                className="w-[300px] h-10 border border-gray-300 rounded-full pl-12 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                type="text"
+                value={formik.values.proposalName}
+                onChange={handleSearchChange}
+                placeholder="Search by Proposal Name..."
+              />
+              <i className="pi pi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <Table
+          data={proposalList?.proposals || []}
+          columns={columns}
+          emptyMessage="No proposals found."
+        />
+
         <Pagination
-          currentPage={
-            proposalList?.pagination?.currentPage
-          }
-          totalPages={
-            proposalList?.pagination?.totalPages
-          }
+          currentPage={proposalList?.pagination?.currentPage}
+          totalPages={proposalList?.pagination?.totalPages}
+          totalItems={proposalList?.pagination?.totalItems}
+          itemsPerPage={limit}
           onPageChange={onPageChange}
           onItemsPerPageChange={onItemsPerPageChange}
         />
       </div>
-    </Paper>
-  )
-}
 
-export default Proposals
+      {isNewProductDialogOpen && (
+        <AddNewProposalDialog
+          onClose={() => setIsNewProductDialogOpen(false)}
+        />
+      )}
+
+      {editing && selectedId && (
+        <AddNewProposalDialog
+          data={proposalDetails}
+          editing
+          onClose={() => {
+            setSelectedId(null);
+            setEditing(false);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Proposals;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Eye } from "lucide-react";
 
 import hplogo from "../../assets/images/image (4).png";
 import acer from "../../assets/images/image (5).png";
@@ -130,9 +131,12 @@ const InventoryDialog = ({ openDialog, handleCloseDialog, onClose, data }) => {
                       marginTop: "10px",
                       marginBottom: "-10px",
                       width: "175px",
+                      minWidth: "unset",
+                      padding: "8px 12px",
                     }}
                     onClick={() => handleEditEvent(data?._id)}
                   >
+                    <Eye size={16} />
                     View Details
                   </Button>
                   {editing && selectedId === data._id && (
@@ -197,6 +201,7 @@ const InventoryDialog = ({ openDialog, handleCloseDialog, onClose, data }) => {
                       className="p-2 text-white rounded-full hover:bg-blue-600"
                       disabled
                     >
+                      <Eye size={14} />
                       View Details
                     </Button>
                   </TableCell>

@@ -1,6 +1,6 @@
-import Horizontal3DBarGraph from "../../../components/3DbarGraph";
-import Pagination from "../../../components/Pagination";
-import Table from "../../../components/Table";
+import Horizontal3DBarGraph from "../../../components/common/3DbarGraph";
+import Pagination from "../../../components/common/Pagination";
+import Table from "../../../components/common/Table";
 import totalInventoryIcon from "../../../assets/icons/rupees.png";
 import totalOrders from "../../../assets/icons/total orders.png";
 import pendingOrders from "../../../assets/icons/pending orders.png";
@@ -12,11 +12,11 @@ import { useEffect, useState } from "react";
 import CreateNewOrderDialog from "../../../components/Dialog/CreateNewOrderDialog";
 import useDashboard from "../../../hooks/dashboard/useDashboard";
 import { useTheme } from "../../../hooks/theme/useTheme";
-import PieChart from "../../../components/DonutPieChart";
+import PieChart from "../../../components/common/DonutPieChart";
 import { GoAlert } from "react-icons/go";
 import { RiMistFill } from "react-icons/ri";
 import { Menu, MenuItem } from "@mui/material";
-import FilterByDateRange from "../../../components/FilterByDateRange";
+import FilterByDateRange from "../../../components/common/FilterByDateRange";
 import useProductManagement from "../../../hooks/product/useProductManagement";
 import AddNewPurchaseDialog from "../../../components/Dialog/AddNewPurchaseDialog";
 import SellsReports from "../reports/SellsReports";
@@ -94,6 +94,24 @@ const InventoryDashboard = () => {
     fetchTotalInventoryValue();
     //fetchWarehousePercentages();
   }, []);
+
+  // Auto-select logged-in company and apply theme
+  useEffect(() => {
+    if (allCompany && allCompany.length > 0) {
+      const loggedInCompanyId = sessionStorage.getItem("selectedCompanyId");
+      const loggedInCompanyName = sessionStorage.getItem("selectedCompanyName");
+      
+      if (loggedInCompanyId && loggedInCompanyName) {
+        const matchedCompany = allCompany.find(
+          (c) => c._id === loggedInCompanyId || c.name === loggedInCompanyName
+        );
+        if (matchedCompany) {
+          sessionStorage.setItem("theme", matchedCompany.name);
+          switchTheme(matchedCompany.name);
+        }
+      }
+    }
+  }, [allCompany, switchTheme]);
 
   console.log("totalOrder : ", totalOrder);
   console.log("totalInventoryValue :", totalInventoryValue);
@@ -253,10 +271,13 @@ const InventoryDashboard = () => {
   const handleCompanySelect = (e) => {
     const selectedOption = e.target.options[e.target.selectedIndex];
     const newCompanyId = selectedOption.id;
+    const newCompanyName = e.target.value;
     console.log("newCompanyId", newCompanyId);
-    console.log("e.target.value", e.target.value);
-    sessionStorage.setItem("theme", e.target.value);
-    switchTheme(sessionStorage.getItem("theme"));
+    console.log("newCompanyName", newCompanyName);
+    sessionStorage.setItem("theme", newCompanyName);
+    sessionStorage.setItem("selectedCompanyId", newCompanyId);
+    sessionStorage.setItem("selectedCompanyName", newCompanyName);
+    switchTheme(newCompanyName);
     console.log("theme :", theme);
   };
 
@@ -348,6 +369,7 @@ const InventoryDashboard = () => {
             id="companyList"
             className="py-2 px-4 rounded-xl w-[200px] h-[45px]"
             onChange={(e) => handleCompanySelect(e)}
+            defaultValue={sessionStorage.getItem("selectedCompanyName") || ""}
           >
             <option value="" disabled>
               Select Company

@@ -1,46 +1,31 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
+import { createPersistedAtom } from "../recoilConfig";
 
-const { persistAtom } = recoilPersist();
 
-export const proposalListAtom = atom({
-  key: "proposalsList",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
+export const proposalListAtom = atom(
+  createPersistedAtom("proposalsList", [])
+);
 
-export const proposalDetailsAtom = atom({
-  key: "proposalDetails",
-  default: null,
-  effects_UNSTABLE: [persistAtom]
-});
+export const proposalDetailsAtom = atom(
+  createPersistedAtom("proposalDetails", null)
+);
 
-export const proposalSrNoAtom = atom({
-  key: "proposalSrNo",
-  default: null,
-  effects_UNSTABLE: [persistAtom]
-});
+export const proposalSrNoAtom = atom(
+  createPersistedAtom("proposalSrNo", null)
+);
 
-export const proposalTypeAtom = atom({
-  key: "proposalType",
-  default: [],
-  effects_UNSTABLE: [persistAtom]
-});
+export const proposalTypeAtom = atom(
+  createPersistedAtom("proposalType", [])
+);
 
-export const responsibleDepartmentsAtom = atom({
-  key: "responsibleDepartment",
-  default: [],
-  effects_UNSTABLE: [persistAtom]
-})
+export const responsibleDepartmentsAtom = atom(
+  createPersistedAtom("responsibleDepartment", [])
+)
 
-export const clientNamesAtom = atom({
-  key: "clientNames",
-  default: [],
-  effects_UNSTABLE: [persistAtom]
-})
+export const clientNamesAtom = atom(
+  createPersistedAtom("clientNames", [])
+)
 
-export const assignedToAtom = atom({
-  key: "assignedTo",
-  default: [],
-  effects_UNSTABLE: [persistAtom]
-})
+export const assignedToAtom = atom(
+  createPersistedAtom("assignedTo", [])
+)

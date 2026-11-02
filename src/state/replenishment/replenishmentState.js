@@ -1,16 +1,6 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
+import { createPersistedAtom } from "../recoilConfig";
 
-const { persistAtom } = recoilPersist();
+export const topSellingProductsAtom = atom(createPersistedAtom("topSellingProducts", null));
 
-export const topSellingProductsAtom = atom({
-  key: "topSellingProducts",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
-
-export const ReplenishmentProductByIdAtom = atom({
-  key: "replenishmentProductById",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const ReplenishmentProductByIdAtom = atom(createPersistedAtom("replenishmentProductById", null));

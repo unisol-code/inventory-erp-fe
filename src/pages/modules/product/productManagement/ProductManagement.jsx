@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 import AddNewProductDialog from "../../../../components/Dialog/AddNewProductDialog";
 import { CiSearch } from "react-icons/ci";
 import { FaFilter } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
 import useProductManagement from "../../../../hooks/product/useProductManagement";
 import ProductDetails from "../../../../components/Dialog/ProductDetails";
-import Pagination from "../../../../components/Pagination";
+import Pagination from "../../../../components/common/Pagination";
 import { debounce } from "lodash";
 
 const ProductManagement = () => {
@@ -238,9 +239,10 @@ const ProductManagement = () => {
                     <td className="text-right px-4 py-4">
                       <button
                         onClick={() => handleViewDetails(product?._id)}
-                        className="clientview text-white px-3 py-1 rounded bg-[#3aa5c9] "
+                        className="flex items-center gap-1.5 clientview text-white px-3 py-1 rounded bg-[#3aa5c9] "
                         // onClick={() => console.log("View Details:", item)}
                       >
+                        <Eye size={14} />
                         View Details
                       </button>
                       {selectId === product?._id && productById && (

@@ -1,39 +1,14 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const getTendersAtom = atom({
-  key: "getTenders", // unique ID (with respect to other atoms/selectors)
-  default: null,
-  effects_UNSTABLE: [persistAtom], // default theme
-});
+export const getTendersAtom = atom(createPersistedAtom("getTenders", null));
 
-export const getStockNameAtom = atom({
-  key: "getStockName", // unique ID (with respect to other atoms/selectors)
-  default: null,
-  effects_UNSTABLE: [persistAtom], // default theme
-});
+export const getStockNameAtom = atom(createPersistedAtom("getStockName", null));
 
-export const createTendersAtom = atom({
-  key: "createTenders",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const createTendersAtom = atom(createPersistedAtom("createTenders", null));
 
-export const getTenderByIdAtom = atom({
-  key: "getTenderById",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const getTenderByIdAtom = atom(createPersistedAtom("getTenderById", null));
 
-export const getNewSrNumberAtom = atom({
-  key: "getNewSrNumber",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const getNewSrNumberAtom = atom(createPersistedAtom("getNewSrNumber", null));
 
-export const updateTenderAtom = atom({
-  key: "updateTender",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const updateTenderAtom = atom(createPersistedAtom("updateTender", null));

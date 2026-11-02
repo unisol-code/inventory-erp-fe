@@ -1,38 +1,23 @@
-import React, { useCallback, useEffect, useState } from "react";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import { useCallback, useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 import debounce from "lodash/debounce";
-import { Button } from "@mui/material";
-import Pagination from "../../../../components/Pagination";
+import Pagination from "../../../../components/common/Pagination";
+import Table from "../../../../components/common/Table";
+import BreadCrumb from "../../../../components/common/BreadCrumb";
 import InventoryDialog from "../../../../components/Dialog/InventoryDialog";
 import useProductManagement from "../../../../hooks/product/useProductManagement";
 import { useFormik } from "formik";
 import useAllInventory from "../../../../hooks/inventory/useAllInventory";
-
-const columns = [
-  { id: "productName", label: "Product Name" },
-  { id: "srNo", label: "Code" },
-  { id: "productType", label: "Item Group" },
-  { id: "date", label: "Added On" },
-  { id: "quantity", label: "Quantity Unit" },
-  { id: "companyPrice", label: "price" },
-  { id: "action", label: "Action" },
-];
+import { useTheme } from "../../../../hooks/theme/useTheme";
 
 const AllInventory = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(7);
+  const { theme } = useTheme();
   const { fetchSearchAllProducts, fetchAllProducts, allProducts, loading } =
     useProductManagement();
   const { fixProductsByID, fetchFixProductsByID } = useAllInventory();
-  console.log("allProducts", allProducts);
 
-  const [openDialog, setOpenDialog] = useState(false);
   const [editing, setEditing] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -59,7 +44,7 @@ const AllInventory = () => {
       if (values.productName) {
         fetchSearchAllProducts(values);
       } else {
-        fetchAllEmployees(page, limit);
+        fetchAllProducts(page, limit);
       }
     },
   });
@@ -80,100 +65,91 @@ const AllInventory = () => {
     fetchAllProducts(page, data);
   };
 
-  const handleDelete = async (_id) => {
-    await deleteProposal(_id);
-    fetchAllProducts(page, limit); // Refresh the list
-  };
-
   const handleEditEvent = (id) => {
-    console.log("id", id);
     fetchFixProductsByID(id);
     setSelectedId(id);
     setEditing(true);
   };
 
+  const breadcrumbPaths = [
+    { label: "Dashboard", url: "/inventory-dashboard" },
+    { label: "All Inventory" },
+  ];
+
+  const columns = [
+    { field: "productName", header: "Product Name", sortable: true },
+    { field: "srNo", header: "Code", sortable: true },
+    { field: "productType", header: "Item Group", sortable: true },
+    { field: "date", header: "Added On", sortable: true },
+    { field: "quantity", header: "Quantity Unit", sortable: true },
+    { field: "companyPrice", header: "Price", sortable: true },
+{
+        field: "action",
+        header: "Action",
+        body: (row) => (
+          <div className="flex justify-center gap-2">
+            <button
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white rounded-lg hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: theme?.accentColor || "#1C5CD6" }}
+              onClick={() => handleEditEvent(row._id)}
+            >
+              <Eye size={14} />
+              View Details
+            </button>
+          </div>
+        ),
+      },
+  ];
+
   return (
-    <Paper
-      sx={{
-        width: "100%",
-        overflow: "hidden",
-        borderRadius: "10px",
-        minHeight: "600px",
-      }}
-    >
-      <div className="search-section flex h-[100px] items-center justify-between px-6 bg-gray-100 border-b border-gray-300">
-        <h2 className="text-2xl font-bold">All Inventory</h2>
-        <input
-          className="w-[300px] h-10 border border-gray-400 rounded-lg px-4"
-          type="text"
-          value={formik.values.productName}
-          onChange={handleSearchChange}
-          placeholder="Search by Product Name..."
+    <div className="container mx-auto">
+      <BreadCrumb paths={breadcrumbPaths} />
+
+      <div className="bg-white shadow-lg rounded-xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold" style={{ color: theme?.accentColor || "#2D3748" }}>
+            All Inventory
+          </h1>
+          <div className="relative">
+            <input
+              className="w-[300px] h-10 border border-gray-300 rounded-full pl-12 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              type="text"
+              value={formik.values.productName}
+              onChange={handleSearchChange}
+              placeholder="Search by Product Name..."
+            />
+            <i className="pi pi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+          </div>
+        </div>
+
+        <Table
+          data={allProducts?.products || []}
+          columns={columns}
+          loading={loading}
+          emptyMessage="No products found."
+        />
+
+        <Pagination
+          currentPage={allProducts?.pagination?.currentPage}
+          totalPages={allProducts?.pagination?.totalPages}
+          totalItems={allProducts?.pagination?.totalItems}
+          itemsPerPage={limit}
+          onPageChange={onPageChange}
+          onItemsPerPageChange={onItemsPerPageChange}
         />
       </div>
 
-      <TableContainer sx={{ maxHeight: 600 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align="center"
-                  style={{ fontWeight: "bold", color: "gray" }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {allProducts?.products?.map((row, index) => (
-              <TableRow key={index} hover role="checkbox" tabIndex={-1}>
-                <TableCell align="center">{row.productName}</TableCell>
-                <TableCell align="center">{row.srNo}</TableCell>
-                <TableCell align="center">{row.productType}</TableCell>
-                <TableCell align="center">{row.date}</TableCell>
-                <TableCell align="center">{row.quantity}</TableCell>
-                <TableCell align="center">{row?.companyPrice}</TableCell>
-                <TableCell align="center">
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "#56AAC5",
-                      color: "white",
-                      borderRadius: "10px",
-                      fontSize: "10px",
-                      fontFamily: "Lexend",
-                    }}
-                    className="p-2 text-white rounded-full hover:bg-blue-600"
-                    onClick={() => handleEditEvent(row._id)}
-                  >
-                    View Details
-                  </Button>
-                  {editing && selectedId === row._id && (
-                    <InventoryDialog
-                      data={fixProductsByID}
-                      openDialog={editing}
-                      onClose={() => {
-                        setSelectedId(null);
-                        setEditing(false);
-                      }}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Pagination
-        currentPage={allProducts?.pagination?.currentPage}
-        totalPages={allProducts?.pagination?.totalPages}
-        onPageChange={onPageChange}
-        onItemsPerPageChange={onItemsPerPageChange}
-      />
-    </Paper>
+      {editing && selectedId && (
+        <InventoryDialog
+          data={fixProductsByID}
+          openDialog={editing}
+          onClose={() => {
+            setSelectedId(null);
+            setEditing(false);
+          }}
+        />
+      )}
+    </div>
   );
 };
 

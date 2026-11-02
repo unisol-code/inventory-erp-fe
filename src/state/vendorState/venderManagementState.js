@@ -1,62 +1,20 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const getVendorByQueryAtom = atom({
-    key: "getVendorByQuery", // unique ID (with respect to other atoms/selectors)
-    default: null,
-    effects_UNSTABLE: [persistAtom], // default theme
-});
+export const getVendorByQueryAtom = atom(createPersistedAtom("getVendorByQuery", null));
 
-export const getVendorByIdAtom = atom({
-    key: "getVendorById", // unique ID (with respect to other atoms/selectors)
-    default: null,
-    effects_UNSTABLE: [persistAtom], // default theme
-});
+export const getVendorByIdAtom = atom(createPersistedAtom("getVendorById", null));
 
-export const createVendorAtom = atom({
-    key: "createVendor", // unique ID (with respect to other atoms/selectors)
-    default: null,
-    effects_UNSTABLE: [persistAtom], // default theme
-});
+export const createVendorAtom = atom(createPersistedAtom("createVendor", null));
 
+export const vendorSrNo=atom(createPersistedAtom("vendorSrNo", null));
 
-export const vendorSrNo=atom({
-    key: "vendorSrNo",
-    default:null,
-    effects_UNSTABLE:[persistAtom]
-})
+export const updateVendor=atom(createPersistedAtom("updateVendor", null));
 
-export const updateVendor=atom({
-    key: "updateVendor", // unique ID (with respect to other atoms
-    default: null,
-    effects_UNSTABLE:[persistAtom], // default theme
-}) 
-
-
-export const getVendorsAtom = atom({
-    key: "getVendors", // unique ID (with respect to other atoms/selectors)
-    default: null,
-    effects_UNSTABLE: [persistAtom], // default theme
-  });
+export const getVendorsAtom = atom(createPersistedAtom("getVendors", null));
   
-  ////////////// VendorByQuery ///////////////
-  export const getVendorsByQueryAtom = atom({
-    key: "getVendorsByQuery",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-  });
-  
-  ////////////  POST //////////////
-  export const postVendorsAtom = atom({
-     key:"postVendors",
-     default: null,
-     effect_UNSTABLE:[persistAtom],
-  });
-  
-  ///////////// PUT/////////////////
-  export const putVendorsAtom = atom({
-    key: "putVendors",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-  });
+export const getVendorsByQueryAtom = atom(createPersistedAtom("getVendorsByQuery", null));
+
+export const postVendorsAtom = atom(createPersistedAtom("postVendors", null));
+
+export const putVendorsAtom = atom(createPersistedAtom("putVendors", null));

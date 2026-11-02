@@ -1,57 +1,20 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const allCompanyAtom = atom({
-  key: "allCompany",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const allCompanyAtom = atom(createPersistedAtom("allCompany", null));
 
-export const totalInventoryValueAtom = atom({
-  key: "totalInventoryValue",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const totalInventoryValueAtom = atom(createPersistedAtom("totalInventoryValue", null));
 
-export const totalOrderAtom = atom({
-  key: "totalOrder",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const totalOrderAtom = atom(createPersistedAtom("totalOrder", null));
 
-export const recentOrdersAtom = atom({
-  key: "recentOrders",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const recentOrdersAtom = atom(createPersistedAtom("recentOrders", null));
 
-export const replenishmentActionsAtom = atom({
-  key: "replenishmentActions",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const replenishmentActionsAtom = atom(createPersistedAtom("replenishmentActions", null));
 
-export const lowInventoryProductAtom = atom({
-  key: "lowInventoryProduct",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const lowInventoryProductAtom = atom(createPersistedAtom("lowInventoryProduct", null));
 
-export const latestQuotationAtom = atom({
-  key: "latestQuotation",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const latestQuotationAtom = atom(createPersistedAtom("latestQuotation", null));
 
-export const latestTenderAtom = atom({
-  key: "latestTender",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const latestTenderAtom = atom(createPersistedAtom("latestTender", null));
 
-export const warehousePercentagesAtom = atom({
-  key: "warehousePercentages",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const warehousePercentagesAtom = atom(createPersistedAtom("warehousePercentages", null));

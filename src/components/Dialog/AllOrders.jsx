@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Table from '../Table'
+import Table from '../common/Table'
 import { IoMdClose } from "react-icons/io";
 import useWarehouseManagement from '../../hooks/warehouseManagement/useWarehouseManagement';
-import Pagination from "../../components/Pagination";
+import Pagination from "../../components/common/Pagination";
 
 const AllOrders = ({ data, columns, onClose }) => {
     const [page, setPage] = useState(1);

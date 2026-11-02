@@ -1,33 +1,12 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const salesByCompanyAtom = atom({
-  key: "salesByCompanys", 
-  default: [],
-  effects_UNSTABLE: [persistAtom], 
-});
+export const salesByCompanyAtom = atom(createPersistedAtom("salesByCompanys", []));
 
-export const salesByProductAtom = atom({
-    key: "salesByProducts",
-    default: [],
-    effects_UNSTABLE: [persistAtom], 
-})
+export const salesByProductAtom = atom(createPersistedAtom("salesByProducts", []));
 
-export const salesByRegionAtom = atom({
-    key: "salesByRegions",
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-}) 
+export const salesByRegionAtom = atom(createPersistedAtom("salesByRegions", []));
 
-export const saleBySalesPersonAtom = atom({
-    key: "saleBySalesPersons",
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-}) 
+export const saleBySalesPersonAtom = atom(createPersistedAtom("saleBySalesPersons", []));
 
-export const allReportsAtom = atom({
-    key: "allReports",
-    default: [],
-    effects_UNSTABLE: [persistAtom]
-}) 
+export const allReportsAtom = atom(createPersistedAtom("allReports", []));

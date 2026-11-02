@@ -1,47 +1,30 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
+import { createPersistedAtom } from "../recoilConfig";
 
-const { persistAtom } = recoilPersist();
+export const quotationListAtom = atom(
+  createPersistedAtom("quotationsList", [])
+);
 
-export const quotationListAtom = atom({
-  key: "quotationsList",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
+export const quotationByIdAtom = atom(
+  createPersistedAtom("quotationById", null)
+);
 
-export const quotationByIdAtom = atom({
-  key: "quotationById",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const quotationSrNoAtom = atom(
+  createPersistedAtom("quotationSrNo", null)  
+);
 
-export const quotationSrNoAtom = atom({
-  key: "quotationSrNo",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
+export const customerNameAtom = atom(
+  createPersistedAtom("customerNames", [])
+);
 
-export const customerNameAtom = atom({
-  key: "customerNames",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
+export const bankNamesAtom = atom(
+  createPersistedAtom("bankName", [])
+);
 
-export const bankNamesAtom = atom({
-  key: "bankName",
-  default: [],
-  effects_UNSTABLE: [persistAtom],
-});
+export const bankDetailsAtom = atom(
+  createPersistedAtom("bankDetail", null)
+);
 
-export const bankDetailsAtom = atom({
-  key: "bankDetail",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
-
-export const termsConditionAtom = atom({
-  key: "termsCondition",
-  default: null,
-  effects_UNSTABLE: [persistAtom],
-});
-
+export const termsConditionAtom = atom(
+  createPersistedAtom("termsCondition", null)
+);

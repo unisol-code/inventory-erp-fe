@@ -5,7 +5,7 @@ import { FaFilter } from "react-icons/fa";
 import Dialog from "../../../components/Dialog/Dialog";
 import useVendor from "../../../hooks/vendor/useVendor";
 import { useFormik } from "formik";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../components/common/Pagination";
 
 const VendorManagement = () => {
   const [page, setPage] = useState(1);

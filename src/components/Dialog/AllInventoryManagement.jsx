@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Table from '../Table'
+import Table from '../common/Table'
 import { IoMdClose } from "react-icons/io";
-import Pagination from "../../components/Pagination";
+import Pagination from "../../components/common/Pagination";
 import useWarehouseManagement from '../../hooks/warehouseManagement/useWarehouseManagement';
 
 const AllInventoryManagement = ({ data, columns, onClose }) => {

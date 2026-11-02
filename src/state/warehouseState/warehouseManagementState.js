@@ -1,51 +1,19 @@
 import { atom } from "recoil";
-import { recoilPersist } from "recoil-persist";
-const { persistAtom } = recoilPersist();
+import { createPersistedAtom } from "../recoilConfig";
 
-export const allWareHousesAtom = atom({
-    key: "allWareHouse",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const allWareHousesAtom = atom(createPersistedAtom("allWareHouse", null));
 
-export const createWareHouseAtom = atom({
-    key: "createWareHouse",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const createWareHouseAtom = atom(createPersistedAtom("createWareHouse", null));
 
-export const getNewIDNumberAtom = atom({
-    key: "getNewIDNumber",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const getNewIDNumberAtom = atom(createPersistedAtom("getNewIDNumber", null));
 
-export const warehouseTypesAtom = atom({
-    key: "warehouseTypes",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const warehouseTypesAtom = atom(createPersistedAtom("warehouseTypes", null));
 
-export const inventoryManagementAtom = atom({
-    key: "inventoryManagement",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const inventoryManagementAtom = atom(createPersistedAtom("inventoryManagement", null));
 
-export const ordersAndShipmentsAtom = atom({
-    key: "orderAndShipments",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const ordersAndShipmentsAtom = atom(createPersistedAtom("ordersAndShipments", null));
 
-export const shipmentsListAtom = atom({
-    key: "shipmentsList",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-});
+export const shipmentsListAtom = atom(createPersistedAtom("shipmentsList", null));
 
-export const warehouseInventoryStatsAtom = atom({
-    key: "warehouseInventoryStats",
-    default: null,
-    effects_UNSTABLE: [persistAtom],
-}); 
+export const warehouseInventoryStatsAtom = atom(createPersistedAtom("warehouseInventoryStats", null));
+ 

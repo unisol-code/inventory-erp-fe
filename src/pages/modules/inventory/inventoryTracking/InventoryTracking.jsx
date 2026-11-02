@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useState } from "react";
+import { Eye } from "lucide-react";
+import BreadCrumb from "../../../../components/common/BreadCrumb";
+import Table from "../../../../components/common/Table";
 import InventoryTrackingDialog from "../../../../components/Dialog/InventoryTrackingDialog";
+import { useTheme } from "../../../../hooks/theme/useTheme";
 
 const InventoryTracking = () => {
   const [searchValue, setSearchValue] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { theme } = useTheme();
+
   const inventoryData = [
     {
       orderId: "1",
@@ -45,109 +43,92 @@ const InventoryTracking = () => {
     },
   ];
 
-  // Define table columns
-  const columns = [
-    { id: "orderId", label: "ORDER ID" },
-    { id: "typeOfProduct", label: "Type of Product" },
-    { id: "item", label: "Item" },
-    { id: "shippingService", label: "Shipping Service" },
-    { id: "trackingCode", label: "Tracking Code" },
-    { id: "orderDate", label: "Order Date" },
-    { id: "reciveDate", label: "Recive Date" },
-    { id: "action", label: "Action" },
-  ];
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
   };
-  const sell = ["Sell", "Buy"];
-  return (
-    <Paper
-      sx={{
-        width: "100%",
-        overflow: "hidden",
-        borderRadius: "10px",
-        minHeight: "600px",
-      }}
-    >
-      {/* Search Section */}
-      <div className="search-section flex items-center justify-between px-6 bg-gray-100 border-b border-gray-300 py-4">
-        <h2 className="text-2xl font-bold">Inventory Tracking</h2>
-        <div className="flex items-center space-x-4">
-          <select
-            className="w-40 h-10 border border-gray-400 rounded-lg px-2"
-            placeholder="Sell"
+
+  const breadcrumbPaths = [
+    { label: "Dashboard", url: "/inventory-dashboard" },
+    { label: "Inventory", url: "/inventory" },
+    { label: "Inventory Tracking" },
+  ];
+
+  const columns = [
+    { field: "orderId", header: "ORDER ID", sortable: true },
+    { field: "typeOfProduct", header: "Type of Product", sortable: true },
+    { field: "item", header: "Item", sortable: true },
+    { field: "shippingService", header: "Shipping Service", sortable: true },
+    { field: "trackingCode", header: "Tracking Code", sortable: true },
+    { field: "orderDate", header: "Order Date", sortable: true },
+    { field: "reciveDate", header: "Recive Date", sortable: true },
+    {
+      field: "action",
+      header: "Action",
+      body: () => (
+        <div className="flex justify-center gap-2">
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white rounded-lg hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: theme?.accentColor || "#1C5CD6" }}
+            onClick={() => setIsDialogOpen(true)}
           >
-            {sell?.map((item, index) => (
-              <option key={index} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-          <input
-            className="w-[300px] h-10 border border-gray-400 rounded-lg px-4"
-            type="text"
-            value={searchValue}
-            onChange={handleSearchChange}
-            placeholder="Search by Product..."
-          />
+            <Eye size={14} />
+            View Details
+          </button>
+          <button
+            className="p-2 text-red-500 hover:text-red-600"
+            onClick={() => alert("Deleting Item")}
+          >
+            <i className="pi pi-trash" />
+          </button>
         </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="container mx-auto">
+      <BreadCrumb paths={breadcrumbPaths} />
+
+      <div className="bg-white shadow-lg rounded-xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold" style={{ color: theme?.accentColor || "#2D3748" }}>
+            Inventory Tracking
+          </h1>
+          <div className="flex items-center gap-4">
+            <select
+              className="w-40 h-10 border border-gray-300 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              defaultValue="Sell"
+            >
+              <option value="Sell">Sell</option>
+              <option value="Buy">Buy</option>
+            </select>
+            <div className="relative">
+              <input
+                className="w-[300px] h-10 border border-gray-300 rounded-full pl-12 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                type="text"
+                value={searchValue}
+                onChange={handleSearchChange}
+                placeholder="Search by Product..."
+              />
+              <i className="pi pi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <Table
+          data={inventoryData}
+          columns={columns}
+          emptyMessage="No inventory tracking records found."
+        />
       </div>
 
-      <div className="table-section">
-        <TableContainer sx={{ maxHeight: 600 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align="center"
-                    style={{ fontWeight: "bold", color: "gray" }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {inventoryData.map((row, index) => (
-                <TableRow key={index} hover role="checkbox" tabIndex={-1}>
-                  <TableCell align="center">{row.orderId}</TableCell>
-                  <TableCell align="center">{row.typeOfProduct}</TableCell>
-                  <TableCell align="center">{row.item}</TableCell>
-                  <TableCell align="center">{row.shippingService}</TableCell>
-                  <TableCell align="center">{row.trackingCode}</TableCell>
-                  <TableCell align="center">{row.orderDate}</TableCell>
-                  <TableCell align="center">{row.reciveDate}</TableCell>
-                  <TableCell align="center">
-                    <>
-                      <button
-                        className="p-2 text-white rounded-full hover:bg-blue-600"
-                        style={{ backgroundColor: "#56AAC5" }}
-                        onClick={() => setIsDialogOpen(true)}
-                      >
-                        {row.action}
-                      </button>
-
-                      <InventoryTrackingDialog
-                        open={isDialogOpen}
-                        onOpenChange={setIsDialogOpen}
-                      />
-                    </>
-                    <button
-                      className="p-2 text-red-500 hover:text-red-600"
-                      onClick={() => alert("Deleting Item")}
-                    >
-                      <DeleteIcon />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    </Paper>
+      {isDialogOpen && (
+        <InventoryTrackingDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
+      )}
+    </div>
   );
 };
 
